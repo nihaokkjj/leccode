@@ -1,5 +1,5 @@
 <script setup>
-<router-view />
+import {} from '@/'
 </script>
 
 <template>

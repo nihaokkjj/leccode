@@ -20,15 +20,17 @@ your-project-root/
 │   │   └── fonts/
 |   |   |
 │   ├── pages/              # 存放所有独立的HTML页面文件 (对应P-开头的HTML)
-│   │   ├── auth/           # 认证相关页面，可以进一步细分
+│   │   ├── forgot/           # 认证相关页面，可以进一步细分
 │   │   │   ├── P-FORGOT_PASSWORD.html
+|   |   |── register/
 │   │   │   └── P-REGISTER_LOGIN.html
 │   │   ├── contests/       # 竞赛相关页面
 │   │   │   ├── P-CONTEST_DETAIL.html
 │   │   │   └── P-CONTEST_LIST.html
 │   │   ├── playlists/      # 播放列表相关页面
-│   │   │   ├── P-PLAYLIST_DETAIL.html
 │   │   │   └── P-PLAYLIST_LIST.html
+|   |   |──My_List
+│   │   │   ├── P-PLAYLIST_DETAIL.html
 │   │   ├── problems/       # 问题相关页面
 │   │   │   ├── P-PROBLEM_DETAIL.html
 │   │   │   └── P-PROBLEM_LIST.html

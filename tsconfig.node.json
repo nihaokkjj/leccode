@@ -19,7 +19,12 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    "baseUrl": ".", // 这表示从项目根目录开始解析
+    "paths": {
+      "@/*": ["src/*"] // 这表示 `@/` 对应 `src/` 目录
+    },
   },
   "include": ["vite.config.ts"]
 }
