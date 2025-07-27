@@ -7,10 +7,13 @@ import My_List from '../Pages/MyList/P-PLAYLIST_DETAIL.html'
 import Profile from '../Pages/Profile/index.vue'
 import Register from '../Pages/Register/index.vue'
 import Layout from '../Pages/Layout/index.vue'
+import Contest_Detail from '../Pages/Contest_Detail/index.vue'
+import Problems from '../Pages/Problems/index.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  
+
   //path, component
   routes: [
     {
@@ -32,10 +35,18 @@ const router = createRouter({
         {
           path: 'contest/:id',
           component: Contest,
+        },   
+        {
+          path: 'contest/detail/:id',
+          component: Contest_Detail,
         },
         {
           path: 'profile/:id',
           component: Profile,
+        },       
+         {
+          path: 'problems/:id',
+          component: Problems,
         },
       ]
     },

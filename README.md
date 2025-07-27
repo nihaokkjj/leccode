@@ -29,7 +29,7 @@ your-project-root/
 │   │   │   └── P-CONTEST_LIST.html
 │   │   ├── playlists/      # 播放列表相关页面
 │   │   │   └── P-PLAYLIST_LIST.html
-|   |   |──My_List
+|   |   |── playlists/my_list
 │   │   │   ├── P-PLAYLIST_DETAIL.html
 │   │   ├── problems/       # 问题相关页面
 │   │   │   ├── P-PROBLEM_DETAIL.html
