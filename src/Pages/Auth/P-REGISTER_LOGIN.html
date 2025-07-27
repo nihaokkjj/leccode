@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册/登录 - 乐扣</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6', // 主色调：现代蓝
+                        secondary: '#10B981', // 成功绿
+                        tertiary: '#6366F1', // 紫色调
+                        danger: '#EF4444', // 错误红
+                        warning: '#F59E0B', // 警告黄
+                        light: '#F3F4F6', // 浅灰背景
+                        dark: '#1F2937', // 深色文本
+                        'text-primary': '#1F2937', // 主要文本色
+                        'text-secondary': '#6B7280', // 次要文本色
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'dropdown': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.01)',
+                    },
+                    borderRadius: {
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .form-input-focus:focus {
+            outline: none;
+            border-color: #3B82F6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+        
+        .tab-active {
+            color: #3B82F6;
+            border-bottom: 2px solid #3B82F6;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-text-primary font-sans min-h-screen flex flex-col">
+    <!-- 顶部导航栏 - 简化版 -->
+    <header id="main-header" class="bg-white shadow-sm">
+        <div class="container mx-auto px-4 flex items-center justify-center h-16">
+            <!-- Logo -->
+            <a href="P-HOME.html" id="logo-link" class="flex items-center space-x-2">
+                <div id="logo" class="text-primary text-2xl font-bold">乐扣</div>
+            </a>
+        </div>
+    </header>
+    
+    <!-- 主内容区 -->
+    <main id="main-content" class="flex-1 container mx-auto px-4 py-12 flex justify-center items-start">
+        <div id="auth-container" class="bg-white rounded-xl shadow-card w-full max-w-md p-8">
+            <!-- 标签切换 -->
+            <div id="auth-tabs" class="flex border-b border-gray-200 mb-8">
+                <button id="tab-login" class="flex-1 py-3 px-4 text-center font-medium tab-active">
+                    登录
+                </button>
+                <button id="tab-register" class="flex-1 py-3 px-4 text-center font-medium text-text-secondary">
+                    注册
+                </button>
+            </div>
+            
+            <!-- 登录表单 -->
+            <form id="login-form" class="space-y-6">
+                <div id="login-username-container" class="space-y-2">
+                    <label for="login-username" class="block text-sm font-medium text-text-primary">用户名/邮箱</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <input type="text" id="login-username" name="username" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg form-input-focus" placeholder="请输入用户名或邮箱" required>
+                    </div>
+                </div>
+                
+                <div id="login-password-container" class="space-y-2">
+                    <label for="login-password" class="block text-sm font-medium text-text-primary">密码</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" id="login-password" name="password" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg form-input-focus" placeholder="请输入密码" required>
+                    </div>
+                </div>
+                
+                <div id="login-options" class="flex items-center justify-between">
+                    <div id="remember-me-container" class="flex items-center">
+                        <input type="checkbox" id="remember-me" name="remember-me" class="h-4 w-4 text-primary border-gray-300 rounded focus:ring-primary">
+                        <label for="remember-me" class="ml-2 block text-sm text-text-secondary">
+                            记住我
+                        </label>
+                    </div>
+                    <a href="P-FORGOT_PASSWORD.html" id="forgot-password-link" class="text-sm text-primary hover:text-blue-600">
+                        忘记密码?
+                    </a>
+                </div>
+                
+                <button type="submit" id="login-submit" class="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                    登录
+                </button>
+            </form>
+            
+            <!-- 注册表单 - 默认隐藏 -->
+            <form id="register-form" class="space-y-6 hidden">
+                <div id="register-username-container" class="space-y-2">
+                    <label for="register-username" class="block text-sm font-medium text-text-primary">用户名</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <input type="text" id="register-username" name="username" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg form-input-focus" placeholder="请设置用户名" required>
+                    </div>
+                </div>
+                
+                <div id="register-email-container" class="space-y-2">
+                    <label for="register-email" class="block text-sm font-medium text-text-primary">邮箱</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fas fa-envelope"></i>
+                        </span>
+                        <input type="email" id="register-email" name="email" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg form-input-focus" placeholder="请输入邮箱" required>
+                    </div>
+                </div>
+                
+                <div id="register-password-container" class="space-y-2">
+                    <label for="register-password" class="block text-sm font-medium text-text-primary">密码</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" id="register-password" name="password" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg form-input-focus" placeholder="请设置密码" required>
+                    </div>
+                </div>
+                
+                <div id="register-confirm-password-container" class="space-y-2">
+                    <label for="register-confirm-password" class="block text-sm font-medium text-text-primary">确认密码</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" id="register-confirm-password" name="confirm-password" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg form-input-focus" placeholder="请再次输入密码" required>
+                    </div>
+                </div>
+                
+                <div id="register-agreement" class="flex items-start">
+                    <input type="checkbox" id="agree-terms" name="agree-terms" class="h-4 w-4 mt-1 text-primary border-gray-300 rounded focus:ring-primary" required>
+                    <label for="agree-terms" class="ml-2 block text-sm text-text-secondary">
+                        我已阅读并同意 <a href="#" id="terms-link" class="text-primary hover:text-blue-600">服务条款</a> 和 <a href="#" id="privacy-link" class="text-primary hover:text-blue-600">隐私政策</a>
+                    </label>
+                </div>
+                
+                <button type="submit" id="register-submit" class="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
+                    注册
+                </button>
+            </form>
+            
+            <!-- 社交媒体登录 -->
+            <div id="social-login" class="mt-8 pt-6 border-t border-gray-200">
+                <p class="text-center text-sm text-text-secondary mb-4">或通过以下方式登录</p>
+                <div class="flex justify-center space-x-4">
+                    <button id="github-login" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+                        <i class="fab fa-github text-xl"></i>
+                    </button>
+                    <button id="google-login" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+                        <i class="fab fa-google text-xl"></i>
+                    </button>
+                    <button id="wechat-login" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+                        <i class="fab fa-weixin text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer id="main-footer" class="bg-white border-t border-gray-200 py-4 mt-8">
+        <div class="container mx-auto px-4 text-center text-sm text-text-secondary">
+            <p>© 2023 乐扣 Online Judge 平台 | 一款面向学生科技工作室成员及大学计算机专业学生的编程学习工具</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 标签切换功能
+            const loginTab = document.querySelector('#tab-login');
+            const registerTab = document.querySelector('#tab-register');
+            const loginForm = document.querySelector('#login-form');
+            const registerForm = document.querySelector('#register-form');
+            
+            loginTab.addEventListener('click', function() {
+                loginTab.classList.add('tab-active');
+                loginTab.classList.remove('text-text-secondary');
+                registerTab.classList.remove('tab-active');
+                registerTab.classList.add('text-text-secondary');
+                
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+            });
+            
+            registerTab.addEventListener('click', function() {
+                registerTab.classList.add('tab-active');
+                registerTab.classList.remove('text-text-secondary');
+                loginTab.classList.remove('tab-active');
+                loginTab.classList.add('text-text-secondary');
+                
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+            });
+            
+            // 登录表单提交
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.querySelector('#login-username').value;
+                const password = document.querySelector('#login-password').value;
+                
+                // 这里应该有验证逻辑
+                console.log('登录信息:', { username, password });
+                
+                // 登录成功后跳转到首页
+                window.location.href = 'P-HOME.html';
+            });
+            
+            // 注册表单提交
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const username = document.querySelector('#register-username').value;
+                const email = document.querySelector('#register-email').value;
+                const password = document.querySelector('#register-password').value;
+                const confirmPassword = document.querySelector('#register-confirm-password').value;
+                
+                // 这里应该有验证逻辑，比如密码一致性检查
+                if (password !== confirmPassword) {
+                    alert('两次输入的密码不一致');
+                    return;
+                }
+                
+                console.log('注册信息:', { username, email, password });
+                
+                // 注册成功后跳转到首页或登录页
+                window.location.href = 'P-HOME.html';
+            });
+            
+            // 忘记密码链接
+            document.querySelector('#forgot-password-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-FORGOT_PASSWORD.html';
+            });
+            
+            // Logo点击返回首页
+            document.querySelector('#logo-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-HOME.html';
+            });
+            
+            // 社交媒体登录按钮
+            document.querySelector('#github-login').addEventListener('click', function() {
+                console.log('需要调用第三方接口实现GitHub登录');
+            });
+            
+            document.querySelector('#google-login').addEventListener('click', function() {
+                console.log('需要调用第三方接口实现Google登录');
+            });
+            
+            document.querySelector('#wechat-login').addEventListener('click', function() {
+                console.log('需要调用第三方接口实现微信登录');
+            });
+        });
+    </script>
+</body>
+</html>

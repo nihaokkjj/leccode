@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>题单详情 - 乐扣</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6', // 主色调：现代蓝
+                        secondary: '#10B981', // 成功绿
+                        tertiary: '#6366F1', // 紫色调
+                        danger: '#EF4444', // 错误红
+                        warning: '#F59E0B', // 警告黄
+                        light: '#F3F4F6', // 浅灰背景
+                        dark: '#1F2937', // 深色文本
+                        'text-primary': '#1F2937', // 主要文本色
+                        'text-secondary': '#6B7280', // 次要文本色
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'dropdown': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.01)',
+                    },
+                    borderRadius: {
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #E5E7EB;
+            overflow: hidden;
+        }
+        
+        .progress-value {
+            height: 100%;
+            background-color: #3B82F6;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-text-primary font-sans min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header id="main-header" class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 flex items-center justify-between h-16">
+            <div id="left-section" class="flex items-center space-x-8">
+                <!-- Logo -->
+                <a href="P-HOME.html" class="flex items-center space-x-2">
+                    <div id="logo" class="text-primary text-2xl font-bold">乐扣</div>
+                </a>
+                
+                <!-- 主导航菜单 -->
+                <nav id="main-nav" class="hidden md:flex items-center space-x-8">
+                    <a href="P-HOME.html" class="text-text-secondary hover:text-primary py-1">首页</a>
+                    <a href="P-PROBLEM_LIST.html" class="text-text-secondary hover:text-primary py-1">题库</a>
+                    <a href="P-CONTEST_LIST.html" class="text-text-secondary hover:text-primary py-1">比赛</a>
+                    <a href="P-PLAYLIST_LIST.html" class="text-primary font-medium border-b-2 border-primary py-1">题单</a>
+                </nav>
+            </div>
+            
+            <div id="right-section" class="flex items-center space-x-4">
+                <!-- 搜索框 -->
+                <div id="search-container" class="relative hidden md:block">
+                    <input id="search-input" type="text" placeholder="搜索题目" class="bg-gray-50 rounded-lg py-2 pl-10 pr-4 w-64 text-sm border border-gray-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                
+                <!-- 用户头像 -->
+                <div id="user-profile" class="relative">
+                    <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
+                        <img id="user-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="用户头像" class="w-8 h-8 rounded-full object-cover">
+                        <span id="user-name" class="text-sm hidden md:inline">程序员小明</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 主内容区 -->
+    <main id="main-content" class="flex-1 container mx-auto px-4 py-6 flex">
+        <!-- 左侧菜单 - 可折叠 -->
+        <aside id="side-menu" class="hidden md:block w-48 lg:w-56 flex-shrink-0 pr-4">
+            <div id="side-menu-container" class="bg-white rounded-xl shadow-card p-4">
+                <div id="menu-header" class="pb-3 border-b border-gray-100">
+                    <h3 class="text-sm font-medium text-text-secondary">功能导航</h3>
+                </div>
+                
+                <nav id="side-nav" class="mt-4 space-y-1">
+                    <a href="P-PROBLEM_LIST.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50">
+                        <i class="fas fa-list-ul w-5 text-center"></i>
+                        <span>题目列表</span>
+                    </a>
+                    <a href="P-PLAYLIST_LIST.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-primary bg-blue-50">
+                        <i class="fas fa-layer-group w-5 text-center"></i>
+                        <span>我的题单</span>
+                    </a>
+                    <a href="P-CONTEST_LIST.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50">
+                        <i class="fas fa-trophy w-5 text-center"></i>
+                        <span>比赛</span>
+                    </a>
+                    <a href="P-PROFILE.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50">
+                        <i class="fas fa-user w-5 text-center"></i>
+                        <span>个人中心</span>
+                    </a>
+                </nav>
+                
+                <div id="menu-stats" class="mt-6 pt-4 border-t border-gray-100">
+                    <div class="text-sm text-text-secondary mb-2">我的统计</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-gray-50 rounded-lg p-2 text-center">
+                            <div class="text-lg font-semibold text-primary">42</div>
+                            <div class="text-xs text-text-secondary">已解题</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 text-center">
+                            <div class="text-lg font-semibold text-tertiary">128</div>
+                            <div class="text-xs text-text-secondary">总提交</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <div id="content-container" class="flex-1 bg-white rounded-xl shadow-card p-6">
+            <!-- 面包屑导航 -->
+            <div id="breadcrumb" class="text-sm text-text-secondary mb-4">
+                <a href="P-HOME.html" class="hover:text-primary">首页</a> &gt; 
+                <a href="P-PLAYLIST_LIST.html" class="hover:text-primary">题单</a> &gt; 
+                <span>算法入门必刷题单</span>
+            </div>
+            
+            <!-- 题单标题和描述 -->
+            <div id="playlist-header" class="mb-6">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h1 id="playlist-title" class="text-xl font-bold">算法入门必刷题单</h1>
+                        <div id="playlist-meta" class="flex items-center mt-2 text-sm text-text-secondary">
+                            <div class="flex items-center mr-4">
+                                <i class="fas fa-user mr-1"></i>
+                                <span id="playlist-creator">创建者: 算法教练</span>
+                            </div>
+                            <div class="flex items-center mr-4">
+                                <i class="fas fa-list-ol mr-1"></i>
+                                <span id="problem-count">题目数量: 20</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-eye mr-1"></i>
+                                <span id="view-count">浏览量: 1,248</span>
+                            </div>
+                        </div>
+                        <div id="playlist-tags" class="flex flex-wrap gap-2 mt-3">
+                            <span class="text-xs px-2 py-1 bg-blue-50 text-primary rounded-full">算法</span>
+                            <span class="text-xs px-2 py-1 bg-green-50 text-secondary rounded-full">入门</span>
+                            <span class="text-xs px-2 py-1 bg-purple-50 text-tertiary rounded-full">数据结构</span>
+                        </div>
+                    </div>
+                    <div id="playlist-actions" class="flex space-x-2">
+                        <button id="btn-share" class="text-text-secondary hover:text-primary p-2 rounded-full hover:bg-gray-50">
+                            <i class="fas fa-share-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="playlist-description" class="mt-4 text-text-secondary">
+                    <p>这是一个为算法初学者精心准备的题单，包含了基础数据结构和常见算法的经典题目。按照由易到难的顺序排列，循序渐进地提升你的算法能力。完成这个题单后，你将掌握解决大部分基础算法问题的能力。</p>
+                </div>
+                
+                <!-- 进度条 -->
+                <div id="progress-section" class="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <div class="flex justify-between items-center mb-2">
+                        <div class="text-sm font-medium">我的进度</div>
+                        <div class="text-sm text-primary font-medium">8/20 题</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-value" style="width: 40%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 题目列表工具栏 -->
+            <div id="problem-list-toolbar" class="flex justify-between items-center mb-4 pb-3 border-b border-gray-200">
+                <div id="view-options" class="flex space-x-2">
+                    <button id="btn-sort-order" class="text-sm px-3 py-1.5 bg-blue-50 text-primary rounded-lg flex items-center">
+                        <i class="fas fa-sort mr-1"></i>
+                        <span>题目顺序</span>
+                    </button>
+                    <button id="btn-sort-difficulty" class="text-sm px-3 py-1.5 bg-white text-text-secondary border border-gray-200 rounded-lg flex items-center hover:bg-gray-50">
+                        <i class="fas fa-signal mr-1"></i>
+                        <span>难度</span>
+                    </button>
+                    <button id="btn-sort-type" class="text-sm px-3 py-1.5 bg-white text-text-secondary border border-gray-200 rounded-lg flex items-center hover:bg-gray-50">
+                        <i class="fas fa-tag mr-1"></i>
+                        <span>题型</span>
+                    </button>
+                </div>
+                <div id="search-filter" class="relative">
+                    <input id="problem-search" type="text" placeholder="搜索题单内题目" class="bg-gray-50 rounded-lg py-1.5 pl-8 pr-4 w-48 text-sm border border-gray-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"></i>
+                </div>
+            </div>
+            
+            <!-- 题目列表 -->
+            <div id="problem-list" class="overflow-x-auto custom-scrollbar">
+                <table class="min-w-full">
+                    <thead>
+                        <tr class="bg-gray-50 text-text-secondary text-sm">
+                            <th class="py-3 px-4 text-left font-medium w-16">序号</th>
+                            <th class="py-3 px-4 text-left font-medium">题目名称</th>
+                            <th class="py-3 px-4 text-left font-medium w-24">难度</th>
+                            <th class="py-3 px-4 text-left font-medium w-32">题型</th>
+                            <th class="py-3 px-4 text-left font-medium w-24">通过率</th>
+                            <th class="py-3 px-4 text-left font-medium w-24">我的进度</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-center">1</td>
+                            <td class="py-3 px-4">
+                                <a href="P-PROBLEM_DETAIL.html?problem_id=1" id="problem-1" class="text-primary hover:underline">两数之和</a>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-50 text-secondary rounded-full">简单</span>
+                            </td>
+                            <td class="py-3 px-4">数组、哈希表</td>
+                            <td class="py-3 px-4">78.5%</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-100 text-secondary rounded-full">已通过</span>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-center">2</td>
+                            <td class="py-3 px-4">
+                                <a href="P-PROBLEM_DETAIL.html?problem_id=2" id="problem-2" class="text-primary hover:underline">有效的括号</a>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-50 text-secondary rounded-full">简单</span>
+                            </td>
+                            <td class="py-3 px-4">栈、字符串</td>
+                            <td class="py-3 px-4">72.1%</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-100 text-secondary rounded-full">已通过</span>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-center">3</td>
+                            <td class="py-3 px-4">
+                                <a href="P-PROBLEM_DETAIL.html?problem_id=3" id="problem-3" class="text-primary hover:underline">合并两个有序链表</a>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-50 text-secondary rounded-full">简单</span>
+                            </td>
+                            <td class="py-3 px-4">链表、递归</td>
+                            <td class="py-3 px-4">68.9%</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-100 text-secondary rounded-full">已通过</span>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-center">4</td>
+                            <td class="py-3 px-4">
+                                <a href="P-PROBLEM_DETAIL.html?problem_id=4" id="problem-4" class="text-primary hover:underline">二分查找</a>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-yellow-50 text-warning rounded-full">中等</span>
+                            </td>
+                            <td class="py-3 px-4">数组、二分法</td>
+                            <td class="py-3 px-4">65.2%</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-100 text-secondary rounded-full">已通过</span>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-center">5</td>
+                            <td class="py-3 px-4">
+                                <a href="P-PROBLEM_DETAIL.html?problem_id=5" id="problem-5" class="text-primary hover:underline">最大子数组和</a>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-yellow-50 text-warning rounded-full">中等</span>
+                            </td>
+                            <td class="py-3 px-4">数组、动态规划</td>
+                            <td class="py-3 px-4">61.8%</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-100 text-secondary rounded-full">已通过</span>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-center">6</td>
+                            <td class="py-3 px-4">
+                                <a href="P-PROBLEM_DETAIL.html?problem_id=6" id="problem-6" class="text-primary hover:underline">爬楼梯</a>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-50 text-secondary rounded-full">简单</span>
+                            </td>
+                            <td class="py-3 px-4">动态规划</td>
+                            <td class="py-3 px-4">64.3%</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-100 text-secondary rounded-full">已通过</span>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-center">7</td>
+                            <td class="py-3 px-4">
+                                <a href="P-PROBLEM_DETAIL.html?problem_id=7" id="problem-7" class="text-primary hover:underline">反转链表</a>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-50 text-secondary rounded-full">简单</span>
+                            </td>
+                            <td class="py-3 px-4">链表</td>
+                            <td class="py-3 px-4">70.5%</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-100 text-secondary rounded-full">已通过</span>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-center">8</td>
+                            <td class="py-3 px-4">
+                                <a href="P-PROBLEM_DETAIL.html?problem_id=8" id="problem-8" class="text-primary hover:underline">二叉树的中序遍历</a>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-50 text-secondary rounded-full">简单</span>
+                            </td>
+                            <td class="py-3 px-4">树、深度优先搜索</td>
+                            <td class="py-3 px-4">73.2%</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-green-100 text-secondary rounded-full">已通过</span>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-center">9</td>
+                            <td class="py-3 px-4">
+                                <a href="P-PROBLEM_DETAIL.html?problem_id=9" id="problem-9" class="text-primary hover:underline">最长递增子序列</a>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-yellow-50 text-warning rounded-full">中等</span>
+                            </td>
+                            <td class="py-3 px-4">数组、动态规划</td>
+                            <td class="py-3 px-4">58.7%</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-text-secondary rounded-full">未完成</span>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-gray-100 hover:bg-gray-50">
+                            <td class="py-3 px-4 text-center">10</td>
+                            <td class="py-3 px-4">
+                                <a href="P-PROBLEM_DETAIL.html?problem_id=10" id="problem-10" class="text-primary hover:underline">最小路径和</a>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-yellow-50 text-warning rounded-full">中等</span>
+                            </td>
+                            <td class="py-3 px-4">数组、动态规划</td>
+                            <td class="py-3 px-4">56.4%</td>
+                            <td class="py-3 px-4">
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-text-secondary rounded-full">未完成</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 分页 -->
+            <div id="pagination" class="mt-6 flex justify-between items-center">
+                <div class="text-sm text-text-secondary">
+                    显示 1-10 / 20 题
+                </div>
+                <div class="flex space-x-2">
+                    <button id="btn-prev-page" class="px-3 py-1 border border-gray-200 rounded-lg text-text-secondary hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button id="btn-page-1" class="px-3 py-1 border border-primary bg-blue-50 rounded-lg text-primary">1</button>
+                    <button id="btn-page-2" class="px-3 py-1 border border-gray-200 rounded-lg text-text-secondary hover:bg-gray-50">2</button>
+                    <button id="btn-next-page" class="px-3 py-1 border border-gray-200 rounded-lg text-text-secondary hover:bg-gray-50">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer id="main-footer" class="bg-white border-t border-gray-200 py-4 mt-8">
+        <div class="container mx-auto px-4 text-center text-sm text-text-secondary">
+            <p>© 2023 乐扣 Online Judge 平台 | 一款面向学生科技工作室成员及大学计算机专业学生的编程学习工具</p>
+        </div>
+    </footer>
+
+    <!-- 分享模态框 -->
+    <div id="share-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-96 max-w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold">分享题单</h3>
+                <button id="btn-close-share" class="text-text-secondary hover:text-primary">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <p class="text-text-secondary mb-2">复制以下链接分享给他人：</p>
+                <div class="flex">
+                    <input id="share-link" type="text" value="https://lekecode.com/playlist/12345" class="flex-1 bg-gray-50 rounded-l-lg py-2 px-3 text-sm border border-gray-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" readonly>
+                    <button id="btn-copy-link" class="bg-primary text-white rounded-r-lg px-4 py-2 text-sm hover:bg-blue-600">
+                        复制
+                    </button>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-text-secondary mb-2">或通过以下方式分享：</p>
+                <div class="flex justify-center space-x-4">
+                    <button id="btn-share-wechat" class="text-green-500 hover:text-green-600 p-2">
+                        <i class="fab fa-weixin text-2xl"></i>
+                    </button>
+                    <button id="btn-share-qq" class="text-blue-500 hover:text-blue-600 p-2">
+                        <i class="fab fa-qq text-2xl"></i>
+                    </button>
+                    <button id="btn-share-weibo" class="text-red-500 hover:text-red-600 p-2">
+                        <i class="fab fa-weibo text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取URL参数
+            function getUrlParams() {
+                const params = {};
+                const queryString = window.location.search.substring(1);
+                const urlParams = new URLSearchParams(queryString);
+                
+                for(const [key, value] of urlParams.entries()) {
+                    params[key] = value;
+                }
+                return params;
+            }
+            
+            // 获取URL参数
+            const params = getUrlParams();
+            
+            // 如果有playlist_id参数，可以用它来加载特定题单
+            if(params.playlist_id) {
+                console.log(`加载题单ID: ${params.playlist_id}`);
+                // 在实际应用中，这里会调用API获取题单数据
+                // 但在这个示例中，我们已经有了模拟数据
+            }
+            
+            // 导航菜单点击事件
+            document.querySelector('#logo').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-HOME.html';
+            });
+            
+            document.querySelectorAll('#main-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = this.getAttribute('href');
+                });
+            });
+            
+            document.querySelectorAll('#side-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = this.getAttribute('href');
+                });
+            });
+            
+            // 用户菜单点击事件
+            document.querySelector('#user-menu-button').addEventListener('click', function() {
+                window.location.href = 'P-PROFILE.html';
+            });
+            
+            // 题目点击事件
+            document.querySelectorAll('#problem-list a[id^="problem-"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const problemId = this.id.split('-')[1];
+                    window.location.href = `P-PROBLEM_DETAIL.html?problem_id=${problemId}`;
+                });
+            });
+            
+            // 排序按钮点击事件
+            document.querySelector('#btn-sort-order').addEventListener('click', function() {
+                // 切换按钮样式
+                this.classList.add('bg-blue-50', 'text-primary');
+                this.classList.remove('bg-white', 'text-text-secondary', 'border', 'border-gray-200');
+                
+                document.querySelector('#btn-sort-difficulty').classList.remove('bg-blue-50', 'text-primary');
+                document.querySelector('#btn-sort-difficulty').classList.add('bg-white', 'text-text-secondary', 'border', 'border-gray-200');
+                
+                document.querySelector('#btn-sort-type').classList.remove('bg-blue-50', 'text-primary');
+                document.querySelector('#btn-sort-type').classList.add('bg-white', 'text-text-secondary', 'border', 'border-gray-200');
+                
+                // 在实际应用中，这里会重新排序题目列表
+                console.log('按题目顺序排序');
+            });
+            
+            document.querySelector('#btn-sort-difficulty').addEventListener('click', function() {
+                // 切换按钮样式
+                this.classList.add('bg-blue-50', 'text-primary');
+                this.classList.remove('bg-white', 'text-text-secondary', 'border', 'border-gray-200');
+                
+                document.querySelector('#btn-sort-order').classList.remove('bg-blue-50', 'text-primary');
+                document.querySelector('#btn-sort-order').classList.add('bg-white', 'text-text-secondary', 'border', 'border-gray-200');
+                
+                document.querySelector('#btn-sort-type').classList.remove('bg-blue-50', 'text-primary');
+                document.querySelector('#btn-sort-type').classList.add('bg-white', 'text-text-secondary', 'border', 'border-gray-200');
+                
+                // 在实际应用中，这里会重新排序题目列表
+                console.log('按难度排序');
+            });
+            
+            document.querySelector('#btn-sort-type').addEventListener('click', function() {
+                // 切换按钮样式
+                this.classList.add('bg-blue-50', 'text-primary');
+                this.classList.remove('bg-white', 'text-text-secondary', 'border', 'border-gray-200');
+                
+                document.querySelector('#btn-sort-order').classList.remove('bg-blue-50', 'text-primary');
+                document.querySelector('#btn-sort-order').classList.add('bg-white', 'text-text-secondary', 'border', 'border-gray-200');
+                
+                document.querySelector('#btn-sort-difficulty').classList.remove('bg-blue-50', 'text-primary');
+                document.querySelector('#btn-sort-difficulty').classList.add('bg-white', 'text-text-secondary', 'border', 'border-gray-200');
+                
+                // 在实际应用中，这里会重新排序题目列表
+                console.log('按题型排序');
+            });
+            
+            // 搜索框输入事件
+            document.querySelector('#problem-search').addEventListener('input', function() {
+                const searchTerm = this.value.trim().toLowerCase();
+                console.log(`搜索题目: ${searchTerm}`);
+                // 在实际应用中，这里会根据搜索词过滤题目列表
+            });
+            
+            // 分页按钮点击事件
+            document.querySelector('#btn-page-1').addEventListener('click', function() {
+                // 已经在第一页，无需操作
+            });
+            
+            document.querySelector('#btn-page-2').addEventListener('click', function() {
+                // 切换到第二页
+                console.log('切换到第二页');
+                // 在实际应用中，这里会加载第二页的题目
+            });
+            
+            document.querySelector('#btn-next-page').addEventListener('click', function() {
+                // 切换到下一页
+                console.log('切换到下一页');
+                // 在实际应用中，这里会加载下一页的题目
+            });
+            
+            // 分享按钮点击事件
+            document.querySelector('#btn-share').addEventListener('click', function() {
+                document.querySelector('#share-modal').classList.remove('hidden');
+            });
+            
+            // 关闭分享模态框
+            document.querySelector('#btn-close-share').addEventListener('click', function() {
+                document.querySelector('#share-modal').classList.add('hidden');
+            });
+            
+            // 点击模态框外部关闭
+            document.querySelector('#share-modal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                }
+            });
+            
+            // 复制分享链接
+            document.querySelector('#btn-copy-link').addEventListener('click', function() {
+                const shareLink = document.querySelector('#share-link');
+                shareLink.select();
+                document.execCommand('copy');
+                
+                // 显示复制成功提示
+                this.textContent = '已复制';
+                setTimeout(() => {
+                    this.textContent = '复制';
+                }, 2000);
+            });
+            
+            // 社交媒体分享按钮
+            document.querySelector('#btn-share-wechat').addEventListener('click', function() {
+                console.log('分享到微信');
+                // 在实际应用中，这里会调用微信分享API
+            });
+            
+            document.querySelector('#btn-share-qq').addEventListener('click', function() {
+                console.log('分享到QQ');
+                // 在实际应用中，这里会调用QQ分享API
+            });
+            
+            document.querySelector('#btn-share-weibo').addEventListener('click', function() {
+                console.log('分享到微博');
+                // 在实际应用中，这里会调用微博分享API
+            });
+        });
+    </script>
+</body>
+</html>

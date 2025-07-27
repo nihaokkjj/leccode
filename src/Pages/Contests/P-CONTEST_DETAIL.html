@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>比赛详情 - 乐扣</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6', // 主色调：现代蓝
+                        secondary: '#10B981', // 成功绿
+                        tertiary: '#6366F1', // 紫色调
+                        danger: '#EF4444', // 错误红
+                        warning: '#F59E0B', // 警告黄
+                        light: '#F3F4F6', // 浅灰背景
+                        dark: '#1F2937', // 深色文本
+                        'text-primary': '#1F2937', // 主要文本色
+                        'text-secondary': '#6B7280', // 次要文本色
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'dropdown': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.01)',
+                    },
+                    borderRadius: {
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        .tab-active {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3B82F6;
+            font-weight: 500;
+        }
+        
+        .countdown-timer {
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .rank-first {
+            background-color: rgba(249, 168, 37, 0.1);
+        }
+        
+        .rank-second {
+            background-color: rgba(160, 174, 192, 0.1);
+        }
+        
+        .rank-third {
+            background-color: rgba(180, 83, 9, 0.1);
+        }
+        
+        .problem-solved {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: #10B981;
+        }
+        
+        .problem-attempted {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-text-primary font-sans min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header id="main-header" class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 flex items-center justify-between h-16">
+            <div id="left-section" class="flex items-center space-x-8">
+                <!-- Logo -->
+                <a href="P-HOME.html" class="flex items-center space-x-2">
+                    <div id="logo" class="text-primary text-2xl font-bold">乐扣</div>
+                </a>
+                
+                <!-- 主导航菜单 -->
+                <nav id="main-nav" class="hidden md:flex items-center space-x-8">
+                    <a href="P-HOME.html" class="text-text-secondary hover:text-primary py-1">首页</a>
+                    <a href="P-PROBLEM_LIST.html" class="text-text-secondary hover:text-primary py-1">题库</a>
+                    <a href="P-CONTEST_LIST.html" class="text-primary font-medium border-b-2 border-primary py-1">比赛</a>
+                    <a href="P-PLAYLIST_LIST.html" class="text-text-secondary hover:text-primary py-1">题单</a>
+                </nav>
+            </div>
+            
+            <div id="right-section" class="flex items-center space-x-4">
+                <!-- 搜索框 -->
+                <div id="search-container" class="relative hidden md:block">
+                    <input id="search-input" type="text" placeholder="搜索比赛" class="bg-gray-50 rounded-lg py-2 pl-10 pr-4 w-64 text-sm border border-gray-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                
+                <!-- 用户头像 -->
+                <div id="user-profile" class="relative">
+                    <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
+                        <img id="user-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="用户头像" class="w-8 h-8 rounded-full object-cover">
+                        <span id="user-name" class="text-sm hidden md:inline">程序员小明</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 主内容区 -->
+    <main id="main-content" class="flex-1 container mx-auto px-4 py-6 flex">
+        <!-- 左侧菜单 - 可折叠 -->
+        <aside id="side-menu" class="hidden md:block w-48 lg:w-56 flex-shrink-0 pr-4">
+            <div id="side-menu-container" class="bg-white rounded-xl shadow-card p-4">
+                <div id="menu-header" class="pb-3 border-b border-gray-100">
+                    <h3 class="text-sm font-medium text-text-secondary">功能导航</h3>
+                </div>
+                
+                <nav id="side-nav" class="mt-4 space-y-1">
+                    <a href="P-PROBLEM_LIST.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50">
+                        <i class="fas fa-list-ul w-5 text-center"></i>
+                        <span>题目列表</span>
+                    </a>
+                    <a href="P-PLAYLIST_LIST.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50">
+                        <i class="fas fa-layer-group w-5 text-center"></i>
+                        <span>我的题单</span>
+                    </a>
+                    <a href="P-CONTEST_LIST.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-primary bg-blue-50">
+                        <i class="fas fa-trophy w-5 text-center"></i>
+                        <span>比赛</span>
+                    </a>
+                    <a href="P-PROFILE.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50">
+                        <i class="fas fa-user w-5 text-center"></i>
+                        <span>个人中心</span>
+                    </a>
+                </nav>
+                
+                <div id="menu-stats" class="mt-6 pt-4 border-t border-gray-100">
+                    <div class="text-sm text-text-secondary mb-2">我的统计</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-gray-50 rounded-lg p-2 text-center">
+                            <div class="text-lg font-semibold text-primary">42</div>
+                            <div class="text-xs text-text-secondary">已解题</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 text-center">
+                            <div class="text-lg font-semibold text-tertiary">128</div>
+                            <div class="text-xs text-text-secondary">总提交</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <div id="content-container" class="flex-1 flex flex-col space-y-4">
+            <!-- 面包屑导航 -->
+            <div id="breadcrumb" class="text-sm text-text-secondary mb-2">
+                <a href="P-HOME.html" class="hover:text-primary">首页</a> &gt; 
+                <a href="P-CONTEST_LIST.html" class="hover:text-primary">比赛</a> &gt; 
+                <span>2023年秋季编程大赛</span>
+            </div>
+            
+            <!-- 比赛信息卡片 -->
+            <div id="contest-info-card" class="bg-white rounded-xl shadow-card p-6">
+                <div id="contest-header" class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                    <div>
+                        <h1 id="contest-title" class="text-2xl font-bold">2023年秋季编程大赛</h1>
+                        <div id="contest-meta" class="flex flex-wrap items-center mt-2 text-sm text-text-secondary">
+                            <div class="flex items-center mr-4 mb-2">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                <span id="contest-date">2023-10-15 14:00 ~ 17:00</span>
+                            </div>
+                            <div class="flex items-center mr-4 mb-2">
+                                <i class="fas fa-users mr-1"></i>
+                                <span id="participant-count">128人参赛</span>
+                            </div>
+                            <div class="flex items-center mr-4 mb-2">
+                                <i class="fas fa-book mr-1"></i>
+                                <span id="contest-rule">ACM/ICPC规则</span>
+                            </div>
+                            <div id="contest-status" class="px-2 py-0.5 bg-blue-100 text-primary rounded-full mb-2">
+                                进行中
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="contest-timer" class="mt-4 md:mt-0">
+                        <div class="text-sm text-text-secondary mb-1">剩余时间</div>
+                        <div id="countdown" class="countdown-timer text-xl font-mono font-bold text-primary">01:45:32</div>
+                    </div>
+                </div>
+                
+                <div id="contest-description" class="mb-6">
+                    <h3 class="text-lg font-medium mb-2">比赛说明</h3>
+                    <p class="text-text-secondary">本次比赛采用ACM/ICPC规则，共有5道题目，难度从简单到困难。参赛者需在规定时间内解决尽可能多的题目。每道题目可以多次提交，但每次错误提交将会增加罚时。最终排名将根据解题数量和罚时综合计算。</p>
+                </div>
+                
+                <div id="contest-actions" class="flex flex-wrap gap-3">
+                    <button id="btn-enter-contest" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-play-circle mr-1"></i> 进入比赛
+                    </button>
+                    <button id="btn-view-ranking" class="px-4 py-2 bg-white border border-primary text-primary rounded-lg hover:bg-blue-50 transition-colors">
+                        <i class="fas fa-chart-bar mr-1"></i> 查看排名
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 标签页导航 -->
+            <div id="contest-tabs" class="flex border-b border-gray-200">
+                <button id="tab-problems" class="px-4 py-3 text-sm font-medium tab-active">
+                    比赛题目
+                </button>
+                <button id="tab-ranking" class="px-4 py-3 text-sm font-medium text-text-secondary hover:text-primary">
+                    实时排名
+                </button>
+                <button id="tab-submissions" class="px-4 py-3 text-sm font-medium text-text-secondary hover:text-primary">
+                    我的提交
+                </button>
+            </div>
+            
+            <!-- 比赛题目列表 -->
+            <div id="problems-content" class="bg-white rounded-xl shadow-card overflow-hidden">
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table id="problems-table" class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50 text-text-secondary text-sm">
+                                <th class="py-3 px-4 text-left font-medium w-16">题号</th>
+                                <th class="py-3 px-4 text-left font-medium">题目名称</th>
+                                <th class="py-3 px-4 text-center font-medium w-24">通过人数</th>
+                                <th class="py-3 px-4 text-center font-medium w-24">提交次数</th>
+                                <th class="py-3 px-4 text-center font-medium w-24">通过率</th>
+                                <th class="py-3 px-4 text-center font-medium w-24">我的状态</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 font-medium">A</td>
+                                <td class="py-3 px-4">
+                                    <a href="#" id="problem-A" class="text-primary hover:underline">两数之和</a>
+                                </td>
+                                <td class="py-3 px-4 text-center">98</td>
+                                <td class="py-3 px-4 text-center">142</td>
+                                <td class="py-3 px-4 text-center">69.0%</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-block px-2 py-1 rounded-full text-xs problem-solved">已通过</span>
+                                </td>
+                            </tr>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 font-medium">B</td>
+                                <td class="py-3 px-4">
+                                    <a href="#" id="problem-B" class="text-primary hover:underline">有效的括号</a>
+                                </td>
+                                <td class="py-3 px-4 text-center">76</td>
+                                <td class="py-3 px-4 text-center">124</td>
+                                <td class="py-3 px-4 text-center">61.3%</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-block px-2 py-1 rounded-full text-xs problem-attempted">尝试中</span>
+                                </td>
+                            </tr>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 font-medium">C</td>
+                                <td class="py-3 px-4">
+                                    <a href="#" id="problem-C" class="text-primary hover:underline">合并两个有序链表</a>
+                                </td>
+                                <td class="py-3 px-4 text-center">54</td>
+                                <td class="py-3 px-4 text-center">98</td>
+                                <td class="py-3 px-4 text-center">55.1%</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-block px-2 py-1 rounded-full text-xs text-text-secondary bg-gray-100">未尝试</span>
+                                </td>
+                            </tr>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 font-medium">D</td>
+                                <td class="py-3 px-4">
+                                    <a href="#" id="problem-D" class="text-primary hover:underline">最长回文子串</a>
+                                </td>
+                                <td class="py-3 px-4 text-center">32</td>
+                                <td class="py-3 px-4 text-center">87</td>
+                                <td class="py-3 px-4 text-center">36.8%</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-block px-2 py-1 rounded-full text-xs text-text-secondary bg-gray-100">未尝试</span>
+                                </td>
+                            </tr>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 font-medium">E</td>
+                                <td class="py-3 px-4">
+                                    <a href="#" id="problem-E" class="text-primary hover:underline">接雨水</a>
+                                </td>
+                                <td class="py-3 px-4 text-center">15</td>
+                                <td class="py-3 px-4 text-center">56</td>
+                                <td class="py-3 px-4 text-center">26.8%</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-block px-2 py-1 rounded-full text-xs text-text-secondary bg-gray-100">未尝试</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 实时排名 (初始隐藏) -->
+            <div id="ranking-content" class="bg-white rounded-xl shadow-card overflow-hidden hidden">
+                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="font-medium">实时排名</h3>
+                    <div class="text-sm text-text-secondary">
+                        <i class="fas fa-sync-alt mr-1"></i> 自动刷新中
+                    </div>
+                </div>
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table id="ranking-table" class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50 text-text-secondary text-sm">
+                                <th class="py-3 px-4 text-left font-medium w-16">排名</th>
+                                <th class="py-3 px-4 text-left font-medium">参赛者</th>
+                                <th class="py-3 px-4 text-center font-medium w-24">解题数</th>
+                                <th class="py-3 px-4 text-center font-medium w-24">罚时</th>
+                                <th class="py-3 px-4 text-center font-medium w-16">A</th>
+                                <th class="py-3 px-4 text-center font-medium w-16">B</th>
+                                <th class="py-3 px-4 text-center font-medium w-16">C</th>
+                                <th class="py-3 px-4 text-center font-medium w-16">D</th>
+                                <th class="py-3 px-4 text-center font-medium w-16">E</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50 rank-first">
+                                <td class="py-3 px-4 font-medium">1</td>
+                                <td class="py-3 px-4 font-medium">
+                                    <div class="flex items-center">
+                                        <img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="用户头像" class="w-6 h-6 rounded-full mr-2">
+                                        <span>算法大师</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center font-medium">5</td>
+                                <td class="py-3 px-4 text-center">120</td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +0<br>12:05
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +1<br>25:42
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +0<br>38:15
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +2<br>65:30
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +3<br>98:45
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50 rank-second">
+                                <td class="py-3 px-4 font-medium">2</td>
+                                <td class="py-3 px-4 font-medium">
+                                    <div class="flex items-center">
+                                        <img src="https://images.unsplash.com/photo-1557862921-37829c790f19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="用户头像" class="w-6 h-6 rounded-full mr-2">
+                                        <span>代码猎人</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center font-medium">4</td>
+                                <td class="py-3 px-4 text-center">95</td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +0<br>10:30
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +0<br>22:15
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +1<br>45:20
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +2<br>72:10
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-red-100 text-red-600 rounded p-1">
+                                        -2
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50 rank-third">
+                                <td class="py-3 px-4 font-medium">3</td>
+                                <td class="py-3 px-4 font-medium">
+                                    <div class="flex items-center">
+                                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="用户头像" class="w-6 h-6 rounded-full mr-2">
+                                        <span>程序员小明</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center font-medium">3</td>
+                                <td class="py-3 px-4 text-center">85</td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +0<br>15:25
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-red-100 text-red-600 rounded p-1">
+                                        -1
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +1<br>42:30
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +3<br>85:15
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-gray-100 text-gray-500 rounded p-1">
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 font-medium">4</td>
+                                <td class="py-3 px-4 font-medium">
+                                    <div class="flex items-center">
+                                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="用户头像" class="w-6 h-6 rounded-full mr-2">
+                                        <span>编程达人</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center font-medium">3</td>
+                                <td class="py-3 px-4 text-center">92</td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +1<br>18:40
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +2<br>35:10
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +0<br>52:30
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-red-100 text-red-600 rounded p-1">
+                                        -3
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-gray-100 text-gray-500 rounded p-1">
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 font-medium">5</td>
+                                <td class="py-3 px-4 font-medium">
+                                    <div class="flex items-center">
+                                        <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="用户头像" class="w-6 h-6 rounded-full mr-2">
+                                        <span>算法新手</span>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center font-medium">2</td>
+                                <td class="py-3 px-4 text-center">45</td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +0<br>20:15
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-green-100 text-green-600 rounded p-1">
+                                        +1<br>45:30
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-red-100 text-red-600 rounded p-1">
+                                        -4
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-gray-100 text-gray-500 rounded p-1">
+                                        
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-xs">
+                                    <div class="bg-gray-100 text-gray-500 rounded p-1">
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 我的提交 (初始隐藏) -->
+            <div id="submissions-content" class="bg-white rounded-xl shadow-card overflow-hidden hidden">
+                <div class="p-4 border-b border-gray-100">
+                    <h3 class="font-medium">我的提交记录</h3>
+                </div>
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table id="submissions-table" class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50 text-text-secondary text-sm">
+                                <th class="py-3 px-4 text-left font-medium">提交时间</th>
+                                <th class="py-3 px-4 text-left font-medium">题目</th>
+                                <th class="py-3 px-4 text-left font-medium">语言</th>
+                                <th class="py-3 px-4 text-center font-medium">状态</th>
+                                <th class="py-3 px-4 text-center font-medium">运行时间</th>
+                                <th class="py-3 px-4 text-center font-medium">内存</th>
+                                <th class="py-3 px-4 text-center font-medium">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm">2023-10-15 14:25:36</td>
+                                <td class="py-3 px-4">
+                                    <a href="#" class="text-primary hover:underline">A. 两数之和</a>
+                                </td>
+                                <td class="py-3 px-4">C++</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-block px-2 py-1 bg-green-100 text-green-600 rounded-full text-xs">通过</span>
+                                </td>
+                                <td class="py-3 px-4 text-center">12ms</td>
+                                <td class="py-3 px-4 text-center">4.2MB</td>
+                                <td class="py-3 px-4 text-center">
+                                    <button id="btn-view-code-1" class="text-primary hover:text-blue-700">
+                                        <i class="fas fa-code"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm">2023-10-15 14:45:12</td>
+                                <td class="py-3 px-4">
+                                    <a href="#" class="text-primary hover:underline">B. 有效的括号</a>
+                                </td>
+                                <td class="py-3 px-4">C++</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-block px-2 py-1 bg-red-100 text-red-600 rounded-full text-xs">答案错误</span>
+                                </td>
+                                <td class="py-3 px-4 text-center">8ms</td>
+                                <td class="py-3 px-4 text-center">3.8MB</td>
+                                <td class="py-3 px-4 text-center">
+                                    <button id="btn-view-code-2" class="text-primary hover:text-blue-700">
+                                        <i class="fas fa-code"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-t border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm">2023-10-15 15:10:45</td>
+                                <td class="py-3 px-4">
+                                    <a href="#" class="text-primary hover:underline">B. 有效的括号</a>
+                                </td>
+                                <td class="py-3 px-4">C++</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-block px-2 py-1 bg-red-100 text-red-600 rounded-full text-xs">运行时错误</span>
+                                </td>
+                                <td class="py-3 px-4 text-center">-</td>
+                                <td class="py-3 px-4 text-center">-</td>
+                                <td class="py-3 px-4 text-center">
+                                    <button id="btn-view-code-3" class="text-primary hover:text-blue-700">
+                                        <i class="fas fa-code"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer id="main-footer" class="bg-white border-t border-gray-200 py-4 mt-8">
+        <div class="container mx-auto px-4 text-center text-sm text-text-secondary">
+            <p>© 2023 乐扣 Online Judge 平台 | 一款面向学生科技工作室成员及大学计算机专业学生的编程学习工具</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取URL参数
+            function getUrlParams() {
+                const params = {};
+                const queryString = window.location.search.substring(1);
+                const urlParams = new URLSearchParams(queryString);
+                
+                for(const [key, value] of urlParams.entries()) {
+                    params[key] = value;
+                }
+                return params;
+            }
+            
+            // 获取URL参数
+            const params = getUrlParams();
+            const contestId = params.contestId || 'contest1'; // 默认值
+            
+            // 标签页切换
+            const tabProblems = document.querySelector('#tab-problems');
+            const tabRanking = document.querySelector('#tab-ranking');
+            const tabSubmissions = document.querySelector('#tab-submissions');
+            
+            const problemsContent = document.querySelector('#problems-content');
+            const rankingContent = document.querySelector('#ranking-content');
+            const submissionsContent = document.querySelector('#submissions-content');
+            
+            tabProblems.addEventListener('click', function() {
+                // 更新标签页状态
+                tabProblems.classList.add('tab-active');
+                tabProblems.classList.remove('text-text-secondary');
+                
+                tabRanking.classList.remove('tab-active');
+                tabRanking.classList.add('text-text-secondary');
+                
+                tabSubmissions.classList.remove('tab-active');
+                tabSubmissions.classList.add('text-text-secondary');
+                
+                // 显示/隐藏内容
+                problemsContent.classList.remove('hidden');
+                rankingContent.classList.add('hidden');
+                submissionsContent.classList.add('hidden');
+            });
+            
+            tabRanking.addEventListener('click', function() {
+                // 更新标签页状态
+                tabProblems.classList.remove('tab-active');
+                tabProblems.classList.add('text-text-secondary');
+                
+                tabRanking.classList.add('tab-active');
+                tabRanking.classList.remove('text-text-secondary');
+                
+                tabSubmissions.classList.remove('tab-active');
+                tabSubmissions.classList.add('text-text-secondary');
+                
+                // 显示/隐藏内容
+                problemsContent.classList.add('hidden');
+                rankingContent.classList.remove('hidden');
+                submissionsContent.classList.add('hidden');
+            });
+            
+            tabSubmissions.addEventListener('click', function() {
+                // 更新标签页状态
+                tabProblems.classList.remove('tab-active');
+                tabProblems.classList.add('text-text-secondary');
+                
+                tabRanking.classList.remove('tab-active');
+                tabRanking.classList.add('text-text-secondary');
+                
+                tabSubmissions.classList.add('tab-active');
+                tabSubmissions.classList.remove('text-text-secondary');
+                
+                // 显示/隐藏内容
+                problemsContent.classList.add('hidden');
+                rankingContent.classList.add('hidden');
+                submissionsContent.classList.remove('hidden');
+            });
+            
+            // 进入比赛按钮
+            document.querySelector('#btn-enter-contest').addEventListener('click', function() {
+                // 显示题目列表
+                tabProblems.click();
+            });
+            
+            // 查看排名按钮
+            document.querySelector('#btn-view-ranking').addEventListener('click', function() {
+                // 显示排名列表
+                tabRanking.click();
+            });
+            
+            // 题目点击事件
+            document.querySelectorAll('[id^="problem-"]').forEach(function(element) {
+                element.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const problemId = this.id.split('-')[1]; // 获取题目ID
+                    window.location.href = `P-PROBLEM_DETAIL.html?problemId=${problemId}&contestId=${contestId}`;
+                });
+            });
+            
+            // 查看代码按钮
+            document.querySelectorAll('[id^="btn-view-code-"]').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    const submissionId = this.id.split('-')[3]; // 获取提交ID
+                    console.log(`查看提交ID为 ${submissionId} 的代码`);
+                    // 在实际应用中，这里会打开一个模态框显示代码
+                    alert(`查看提交ID为 ${submissionId} 的代码`);
+                });
+            });
+            
+            // 倒计时功能
+            function updateCountdown() {
+                // 在实际应用中，这里会根据比赛结束时间计算剩余时间
+                // 这里仅作为示例，每秒减少1秒
+                const countdownElement = document.querySelector('#countdown');
+                let timeString = countdownElement.textContent;
+                let [hours, minutes, seconds] = timeString.split(':').map(Number);
+                
+                let totalSeconds = hours * 3600 + minutes * 60 + seconds;
+                if (totalSeconds > 0) {
+                    totalSeconds--;
+                    
+                    hours = Math.floor(totalSeconds / 3600);
+                    minutes = Math.floor((totalSeconds % 3600) / 60);
+                    seconds = totalSeconds % 60;
+                    
+                    countdownElement.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                } else {
+                    countdownElement.textContent = '00:00:00';
+                    clearInterval(countdownInterval);
+                    
+                    // 比赛结束，更新状态
+                    const contestStatus = document.querySelector('#contest-status');
+                    contestStatus.textContent = '已结束';
+                    contestStatus.classList.remove('bg-blue-100', 'text-primary');
+                    contestStatus.classList.add('bg-gray-100', 'text-text-secondary');
+                }
+            }
+            
+            // 每秒更新倒计时
+            const countdownInterval = setInterval(updateCountdown, 1000);
+            
+            // 导航链接
+            document.querySelector('#logo').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-HOME.html';
+            });
+            
+            document.querySelector('#main-nav a[href="P-HOME.html"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-HOME.html';
+            });
+            
+            document.querySelector('#main-nav a[href="P-PROBLEM_LIST.html"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-PROBLEM_LIST.html';
+            });
+            
+            document.querySelector('#main-nav a[href="P-CONTEST_LIST.html"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-CONTEST_LIST.html';
+            });
+            
+            document.querySelector('#main-nav a[href="P-PLAYLIST_LIST.html"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-PLAYLIST_LIST.html';
+            });
+            
+            // 侧边菜单链接
+            document.querySelector('#side-nav a[href="P-PROBLEM_LIST.html"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-PROBLEM_LIST.html';
+            });
+            
+            document.querySelector('#side-nav a[href="P-PLAYLIST_LIST.html"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-PLAYLIST_LIST.html';
+            });
+            
+            document.querySelector('#side-nav a[href="P-CONTEST_LIST.html"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-CONTEST_LIST.html';
+            });
+            
+            document.querySelector('#side-nav a[href="P-PROFILE.html"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-PROFILE.html';
+            });
+            
+            // 面包屑导航
+            document.querySelector('#breadcrumb a[href="P-HOME.html"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-HOME.html';
+            });
+            
+            document.querySelector('#breadcrumb a[href="P-CONTEST_LIST.html"]').addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = 'P-CONTEST_LIST.html';
+            });
+        });
+    </script>
+</body>
+</html>

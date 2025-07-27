@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 乐扣</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6', // 主色调：现代蓝
+                        secondary: '#10B981', // 成功绿
+                        tertiary: '#6366F1', // 紫色调
+                        danger: '#EF4444', // 错误红
+                        warning: '#F59E0B', // 警告黄
+                        light: '#F3F4F6', // 浅灰背景
+                        dark: '#1F2937', // 深色文本
+                        'text-primary': '#1F2937', // 主要文本色
+                        'text-secondary': '#6B7280', // 次要文本色
+                    },
+                    boxShadow: {
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+                        'dropdown': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.01)',
+                    },
+                    borderRadius: {
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #F3F4F6;
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #D1D5DB;
+            border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9CA3AF;
+        }
+        
+        .heat-map-cell {
+            width: 12px;
+            height: 12px;
+            margin: 2px;
+            border-radius: 2px;
+        }
+        
+        .heat-level-0 {
+            background-color: #ebedf0;
+        }
+        
+        .heat-level-1 {
+            background-color: #c6e48b;
+        }
+        
+        .heat-level-2 {
+            background-color: #7bc96f;
+        }
+        
+        .heat-level-3 {
+            background-color: #239a3b;
+        }
+        
+        .heat-level-4 {
+            background-color: #196127;
+        }
+        
+        .tab-active {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: #3B82F6;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-text-primary font-sans min-h-screen flex flex-col">
+    <!-- 顶部导航栏 -->
+    <header id="main-header" class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="container mx-auto px-4 flex items-center justify-between h-16">
+            <div id="left-section" class="flex items-center space-x-8">
+                <!-- Logo -->
+                <a href="P-HOME.html" class="flex items-center space-x-2">
+                    <div id="logo" class="text-primary text-2xl font-bold">乐扣</div>
+                </a>
+                
+                <!-- 主导航菜单 -->
+                <nav id="main-nav" class="hidden md:flex items-center space-x-8">
+                    <a href="P-HOME.html" class="text-text-secondary hover:text-primary py-1">首页</a>
+                    <a href="P-PROBLEM_LIST.html" class="text-text-secondary hover:text-primary py-1">题库</a>
+                    <a href="P-CONTEST_LIST.html" class="text-text-secondary hover:text-primary py-1">比赛</a>
+                    <a href="P-PLAYLIST_LIST.html" class="text-text-secondary hover:text-primary py-1">题单</a>
+                </nav>
+            </div>
+            
+            <div id="right-section" class="flex items-center space-x-4">
+                <!-- 搜索框 -->
+                <div id="search-container" class="relative hidden md:block">
+                    <input id="search-input" type="text" placeholder="搜索题目" class="bg-gray-50 rounded-lg py-2 pl-10 pr-4 w-64 text-sm border border-gray-200 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                
+                <!-- 用户头像 -->
+                <div id="user-profile" class="relative">
+                    <button id="user-menu-button" class="flex items-center space-x-2 focus:outline-none">
+                        <img id="user-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80" alt="用户头像" class="w-8 h-8 rounded-full object-cover">
+                        <span id="user-name" class="text-sm hidden md:inline">程序员小明</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- 主内容区 -->
+    <main id="main-content" class="flex-1 container mx-auto px-4 py-6 flex">
+        <!-- 左侧菜单 - 可折叠 -->
+        <aside id="side-menu" class="hidden md:block w-48 lg:w-56 flex-shrink-0 pr-4">
+            <div id="side-menu-container" class="bg-white rounded-xl shadow-card p-4">
+                <div id="menu-header" class="pb-3 border-b border-gray-100">
+                    <h3 class="text-sm font-medium text-text-secondary">功能导航</h3>
+                </div>
+                
+                <nav id="side-nav" class="mt-4 space-y-1">
+                    <a href="P-PROBLEM_LIST.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50">
+                        <i class="fas fa-list-ul w-5 text-center"></i>
+                        <span>题目列表</span>
+                    </a>
+                    <a href="P-PLAYLIST_LIST.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50">
+                        <i class="fas fa-layer-group w-5 text-center"></i>
+                        <span>我的题单</span>
+                    </a>
+                    <a href="P-CONTEST_LIST.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-text-secondary hover:bg-gray-50">
+                        <i class="fas fa-trophy w-5 text-center"></i>
+                        <span>比赛</span>
+                    </a>
+                    <a href="P-PROFILE.html" class="flex items-center space-x-3 px-3 py-2 rounded-lg text-primary bg-blue-50">
+                        <i class="fas fa-user w-5 text-center"></i>
+                        <span>个人中心</span>
+                    </a>
+                </nav>
+                
+                <div id="menu-stats" class="mt-6 pt-4 border-t border-gray-100">
+                    <div class="text-sm text-text-secondary mb-2">我的统计</div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-gray-50 rounded-lg p-2 text-center">
+                            <div class="text-lg font-semibold text-primary">42</div>
+                            <div class="text-xs text-text-secondary">已解题</div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-2 text-center">
+                            <div class="text-lg font-semibold text-tertiary">128</div>
+                            <div class="text-xs text-text-secondary">总提交</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <div id="content-container" class="flex-1 bg-white rounded-xl shadow-card p-6 overflow-hidden">
+            <!-- 面包屑导航 -->
+            <div id="breadcrumb" class="text-sm text-text-secondary mb-4">
+                <a href="P-HOME.html" class="hover:text-primary">首页</a> &gt; 
+                <span>个人中心</span>
+            </div>
+            
+            <!-- 个人信息展示区域 -->
+            <div id="profile-header" class="flex flex-col md:flex-row items-start md:items-center mb-8 pb-6 border-b border-gray-100">
+                <div id="profile-avatar-container" class="flex-shrink-0 mb-4 md:mb-0 md:mr-6">
+                    <img id="profile-avatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=150&q=80" alt="用户头像" class="w-24 h-24 rounded-full object-cover border-4 border-white shadow-md">
+                </div>
+                
+                <div id="profile-info" class="flex-1">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                        <div>
+                            <h1 id="profile-name" class="text-2xl font-bold mb-1">程序员小明</h1>
+                            <p id="profile-bio" class="text-text-secondary mb-2">热爱编程，擅长算法，正在学习前端开发</p>
+                        </div>
+                        
+                        <div id="profile-stats" class="flex space-x-6 mt-2 md:mt-0">
+                            <div class="text-center">
+                                <div class="text-lg font-semibold text-primary">42</div>
+                                <div class="text-xs text-text-secondary">已解题</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-lg font-semibold text-tertiary">Lv.3</div>
+                                <div class="text-xs text-text-secondary">等级</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-lg font-semibold text-warning">#128</div>
+                                <div class="text-xs text-text-secondary">排名</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="profile-actions" class="mt-4">
+                        <button id="btn-edit-profile" class="text-sm text-primary bg-blue-50 hover:bg-blue-100 rounded-lg px-4 py-1.5">
+                            <i class="fas fa-edit mr-1"></i> 编辑个人信息
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 做题数据统计区域 -->
+            <div id="stats-section" class="mb-8">
+                <h2 class="text-lg font-semibold mb-4">做题统计</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 难度分布图表 -->
+                    <div id="difficulty-chart" class="bg-gray-50 rounded-xl p-4">
+                        <h3 class="text-sm font-medium text-text-secondary mb-3">难度分布</h3>
+                        <div class="flex items-end h-40">
+                            <div class="flex-1 flex flex-col items-center">
+                                <div class="bg-green-400 w-16 h-24 rounded-t-md"></div>
+                                <div class="mt-2 text-xs text-text-secondary">简单 (24)</div>
+                            </div>
+                            <div class="flex-1 flex flex-col items-center">
+                                <div class="bg-yellow-400 w-16 h-16 rounded-t-md"></div>
+                                <div class="mt-2 text-xs text-text-secondary">中等 (16)</div>
+                            </div>
+                            <div class="flex-1 flex flex-col items-center">
+                                <div class="bg-red-400 w-16 h-2 rounded-t-md"></div>
+                                <div class="mt-2 text-xs text-text-secondary">困难 (2)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 做题热力图 -->
+                    <div id="heatmap-container" class="bg-gray-50 rounded-xl p-4">
+                        <h3 class="text-sm font-medium text-text-secondary mb-3">做题热力图</h3>
+                        <div class="mb-3">
+                            <div class="flex items-center justify-between text-xs text-text-secondary mb-2">
+                                <span>近一年做题活跃度</span>
+                                <span>共完成 156 题</span>
+                            </div>
+                        </div>
+                        <div id="heatmap" class="overflow-x-auto">
+                            <div class="flex gap-1 min-w-max">
+                                <!-- 月份标签 -->
+                                <div class="flex flex-col mr-2">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="text-xs text-text-secondary mb-1 h-3 flex items-center">一</div>
+                                    <div class="text-xs text-text-secondary mb-1 h-3 flex items-center">二</div>
+                                    <div class="text-xs text-text-secondary mb-1 h-3 flex items-center">三</div>
+                                    <div class="text-xs text-text-secondary mb-1 h-3 flex items-center">四</div>
+                                    <div class="text-xs text-text-secondary mb-1 h-3 flex items-center">五</div>
+                                    <div class="text-xs text-text-secondary mb-1 h-3 flex items-center">六</div>
+                                    <div class="text-xs text-text-secondary mb-1 h-3 flex items-center">日</div>
+                                </div>
+                                
+                                <!-- 1月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">1月</div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                
+                                <!-- 2月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">2月</div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                
+                                <!-- 3月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">3月</div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                
+                                <!-- 4月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">4月</div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                </div>
+                                
+                                <!-- 5月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">5月</div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                
+                                <!-- 6月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">6月</div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                
+                                <!-- 7月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">7月</div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                
+                                <!-- 8月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">8月</div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                </div>
+                                
+                                <!-- 9月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">9月</div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                
+                                <!-- 10月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">10月</div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                </div>
+                                
+                                <!-- 11月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">11月</div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                
+                                <!-- 12月 -->
+                                <div class="flex flex-col">
+                                    <div class="text-xs text-text-secondary mb-1 text-center h-3">12月</div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <div class="h-3 mb-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-end mt-2">
+                            <div class="flex items-center text-xs text-text-secondary">
+                                <span>少</span>
+                                <div class="flex mx-1">
+                                    <div class="heat-map-cell heat-level-0"></div>
+                                    <div class="heat-map-cell heat-level-1"></div>
+                                    <div class="heat-map-cell heat-level-2"></div>
+                                    <div class="heat-map-cell heat-level-3"></div>
+                                    <div class="heat-map-cell heat-level-4"></div>
+                                </div>
+                                <span>多</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 标签页导航 -->
+            <div id="tabs-container" class="mb-4">
+                <div id="tabs" class="flex border-b border-gray-200">
+                    <button id="tab-submissions" class="px-4 py-2 text-sm font-medium tab-active">提交记录</button>
+                    <button id="tab-contests" class="px-4 py-2 text-sm font-medium text-text-secondary hover:text-primary">参与的比赛</button>
+                    <button id="tab-playlists" class="px-4 py-2 text-sm font-medium text-text-secondary hover:text-primary">创建的题单</button>
+                </div>
+            </div>
+            
+            <!-- 提交记录列表 -->
+            <div id="submissions-content" class="tab-content">
+                <!-- 筛选工具栏 -->
+                <div id="submissions-toolbar" class="flex flex-wrap items-center justify-between mb-4 gap-2">
+                    <div id="submissions-filters" class="flex flex-wrap items-center gap-2">
+                        <select id="filter-result" class="bg-white border border-gray-200 rounded-lg py-1.5 px-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="">全部结果</option>
+                            <option value="accepted">通过</option>
+                            <option value="wrong_answer">答案错误</option>
+                            <option value="time_limit_exceeded">超时</option>
+                            <option value="memory_limit_exceeded">超内存</option>
+                            <option value="runtime_error">运行时错误</option>
+                            <option value="compile_error">编译错误</option>
+                        </select>
+                        
+                        <select id="filter-difficulty" class="bg-white border border-gray-200 rounded-lg py-1.5 px-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="">全部难度</option>
+                            <option value="easy">简单</option>
+                            <option value="medium">中等</option>
+                            <option value="hard">困难</option>
+                        </select>
+                        
+                        <select id="filter-language" class="bg-white border border-gray-200 rounded-lg py-1.5 px-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="">全部语言</option>
+                            <option value="cpp">C++</option>
+                            <option value="java">Java</option>
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="go">Go</option>
+                        </select>
+                    </div>
+                    
+                    <div id="submissions-sort" class="flex items-center">
+                        <select id="sort-by" class="bg-white border border-gray-200 rounded-lg py-1.5 px-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+                            <option value="time_desc">时间（最新）</option>
+                            <option value="time_asc">时间（最旧）</option>
+                            <option value="runtime_asc">运行时间（升序）</option>
+                            <option value="memory_asc">内存使用（升序）</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- 提交记录表格 -->
+                <div id="submissions-table-container" class="overflow-x-auto custom-scrollbar">
+                    <table id="submissions-table" class="w-full min-w-full border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-text-secondary text-xs">
+                                <th class="py-3 px-4 text-left font-medium">提交时间</th>
+                                <th class="py-3 px-4 text-left font-medium">题目名称</th>
+                                <th class="py-3 px-4 text-left font-medium">编程语言</th>
+                                <th class="py-3 px-4 text-left font-medium">判题结果</th>
+                                <th class="py-3 px-4 text-left font-medium">运行时间</th>
+                                <th class="py-3 px-4 text-left font-medium">内存使用</th>
+                                <th class="py-3 px-4 text-left font-medium">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm">2023-06-15 14:32</td>
+                                <td class="py-3 px-4">
+                                    <a href="P-PROBLEM_DETAIL.html?problemId=p001" class="text-primary hover:underline">二分查找</a>
+                                </td>
+                                <td class="py-3 px-4 text-sm">C++</td>
+                                <td class="py-3 px-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i> 通过
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm">4 ms</td>
+                                <td class="py-3 px-4 text-sm">7.2 MB</td>
+                                <td class="py-3 px-4">
+                                    <button id="btn-view-code-1" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-code mr-1"></i> 查看代码
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm">2023-06-15 13:45</td>
+                                <td class="py-3 px-4">
+                                    <a href="P-PROBLEM_DETAIL.html?problemId=p002" class="text-primary hover:underline">两数之和</a>
+                                </td>
+                                <td class="py-3 px-4 text-sm">Python</td>
+                                <td class="py-3 px-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i> 通过
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm">36 ms</td>
+                                <td class="py-3 px-4 text-sm">14.3 MB</td>
+                                <td class="py-3 px-4">
+                                    <button id="btn-view-code-2" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-code mr-1"></i> 查看代码
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm">2023-06-14 21:18</td>
+                                <td class="py-3 px-4">
+                                    <a href="P-PROBLEM_DETAIL.html?problemId=p003" class="text-primary hover:underline">合并两个有序链表</a>
+                                </td>
+                                <td class="py-3 px-4 text-sm">Java</td>
+                                <td class="py-3 px-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        <i class="fas fa-times-circle mr-1"></i> 答案错误
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm">-</td>
+                                <td class="py-3 px-4 text-sm">-</td>
+                                <td class="py-3 px-4">
+                                    <button id="btn-view-code-3" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-code mr-1"></i> 查看代码
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm">2023-06-14 20:05</td>
+                                <td class="py-3 px-4">
+                                    <a href="P-PROBLEM_DETAIL.html?problemId=p004" class="text-primary hover:underline">有效的括号</a>
+                                </td>
+                                <td class="py-3 px-4 text-sm">JavaScript</td>
+                                <td class="py-3 px-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        <i class="fas fa-exclamation-circle mr-1"></i> 超时
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm">-</td>
+                                <td class="py-3 px-4 text-sm">-</td>
+                                <td class="py-3 px-4">
+                                    <button id="btn-view-code-4" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-code mr-1"></i> 查看代码
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4 text-sm">2023-06-13 16:22</td>
+                                <td class="py-3 px-4">
+                                    <a href="P-PROBLEM_DETAIL.html?problemId=p005" class="text-primary hover:underline">最长回文子串</a>
+                                </td>
+                                <td class="py-3 px-4 text-sm">C++</td>
+                                <td class="py-3 px-4">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <i class="fas fa-check-circle mr-1"></i> 通过
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-sm">12 ms</td>
+                                <td class="py-3 px-4 text-sm">9.8 MB</td>
+                                <td class="py-3 px-4">
+                                    <button id="btn-view-code-5" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-code mr-1"></i> 查看代码
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页控件 -->
+                <div id="submissions-pagination" class="flex justify-between items-center mt-6">
+                    <div class="text-sm text-text-secondary">
+                        显示 1-5 条，共 42 条记录
+                    </div>
+                    <div class="flex space-x-1">
+                        <button id="page-prev" class="px-3 py-1 border border-gray-200 rounded-md text-sm text-text-secondary hover:bg-gray-50 disabled:opacity-50" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="px-3 py-1 border border-primary bg-primary text-white rounded-md text-sm">1</button>
+                        <button class="px-3 py-1 border border-gray-200 rounded-md text-sm text-text-secondary hover:bg-gray-50">2</button>
+                        <button class="px-3 py-1 border border-gray-200 rounded-md text-sm text-text-secondary hover:bg-gray-50">3</button>
+                        <button class="px-3 py-1 border border-gray-200 rounded-md text-sm text-text-secondary hover:bg-gray-50">...</button>
+                        <button class="px-3 py-1 border border-gray-200 rounded-md text-sm text-text-secondary hover:bg-gray-50">9</button>
+                        <button id="page-next" class="px-3 py-1 border border-gray-200 rounded-md text-sm text-text-secondary hover:bg-gray-50">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 参与的比赛 -->
+            <div id="contests-content" class="tab-content hidden">
+                <div id="contests-table-container" class="overflow-x-auto custom-scrollbar">
+                    <table id="contests-table" class="w-full min-w-full border-collapse">
+                        <thead>
+                            <tr class="bg-gray-50 text-text-secondary text-xs">
+                                <th class="py-3 px-4 text-left font-medium">比赛名称</th>
+                                <th class="py-3 px-4 text-left font-medium">比赛时间</th>
+                                <th class="py-3 px-4 text-left font-medium">排名</th>
+                                <th class="py-3 px-4 text-left font-medium">解题数</th>
+                                <th class="py-3 px-4 text-left font-medium">罚时</th>
+                                <th class="py-3 px-4 text-left font-medium">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4">
+                                    <a href="P-CONTEST_DETAIL.html?contestId=c001" class="text-primary hover:underline">2023年春季编程大赛</a>
+                                </td>
+                                <td class="py-3 px-4 text-sm">2023-05-20 14:00 - 17:00</td>
+                                <td class="py-3 px-4 text-sm">12 / 128</td>
+                                <td class="py-3 px-4 text-sm">4 / 6</td>
+                                <td class="py-3 px-4 text-sm">42分钟</td>
+                                <td class="py-3 px-4">
+                                    <a href="P-CONTEST_DETAIL.html?contestId=c001" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-trophy mr-1"></i> 查看详情
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4">
+                                    <a href="P-CONTEST_DETAIL.html?contestId=c002" class="text-primary hover:underline">算法入门训练赛</a>
+                                </td>
+                                <td class="py-3 px-4 text-sm">2023-04-15 19:00 - 21:00</td>
+                                <td class="py-3 px-4 text-sm">5 / 64</td>
+                                <td class="py-3 px-4 text-sm">5 / 5</td>
+                                <td class="py-3 px-4 text-sm">78分钟</td>
+                                <td class="py-3 px-4">
+                                    <a href="P-CONTEST_DETAIL.html?contestId=c002" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-trophy mr-1"></i> 查看详情
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr class="border-b border-gray-100 hover:bg-gray-50">
+                                <td class="py-3 px-4">
+                                    <a href="P-CONTEST_DETAIL.html?contestId=c003" class="text-primary hover:underline">科技工作室招新考核</a>
+                                </td>
+                                <td class="py-3 px-4 text-sm">2023-03-10 10:00 - 12:00</td>
+                                <td class="py-3 px-4 text-sm">3 / 42</td>
+                                <td class="py-3 px-4 text-sm">3 / 4</td>
+                                <td class="py-3 px-4 text-sm">35分钟</td>
+                                <td class="py-3 px-4">
+                                    <a href="P-CONTEST_DETAIL.html?contestId=c003" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-trophy mr-1"></i> 查看详情
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- 创建的题单 -->
+            <div id="playlists-content" class="tab-content hidden">
+                <div id="playlists-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div id="playlist-card-1" class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-semibold">
+                                    <a href="P-PLAYLIST_DETAIL.html?playlistId=pl001" class="text-text-primary hover:text-primary">算法入门必刷题</a>
+                                </h3>
+                                <span class="bg-blue-100 text-primary text-xs px-2 py-0.5 rounded-full">公开</span>
+                            </div>
+                            <p class="text-text-secondary text-sm mb-3 line-clamp-2">收集了经典的算法入门题目，适合初学者循序渐进地学习基础算法。</p>
+                            <div class="flex items-center text-xs text-text-secondary mb-3">
+                                <span class="mr-3"><i class="fas fa-list-ul mr-1"></i> 15题</span>
+                                <span><i class="fas fa-eye mr-1"></i> 1,248次浏览</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1 mb-3">
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-text-secondary rounded-full">数组</span>
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-text-secondary rounded-full">链表</span>
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-text-secondary rounded-full">排序</span>
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-text-secondary rounded-full">二分查找</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="text-xs text-text-secondary">
+                                    <i class="far fa-calendar-alt mr-1"></i> 2023-06-01 创建
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button id="btn-edit-playlist-1" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button id="btn-share-playlist-1" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="playlist-card-2" class="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-lg font-semibold">
+                                    <a href="P-PLAYLIST_DETAIL.html?playlistId=pl002" class="text-text-primary hover:text-primary">动态规划专题</a>
+                                </h3>
+                                <span class="bg-gray-100 text-text-secondary text-xs px-2 py-0.5 rounded-full">私有</span>
+                            </div>
+                            <p class="text-text-secondary text-sm mb-3 line-clamp-2">从基础到进阶的动态规划题目集合，包含经典DP问题和变种题目。</p>
+                            <div class="flex items-center text-xs text-text-secondary mb-3">
+                                <span class="mr-3"><i class="fas fa-list-ul mr-1"></i> 8题</span>
+                                <span><i class="fas fa-eye mr-1"></i> 仅自己可见</span>
+                            </div>
+                            <div class="flex flex-wrap gap-1 mb-3">
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-text-secondary rounded-full">动态规划</span>
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-text-secondary rounded-full">背包问题</span>
+                                <span class="text-xs px-2 py-0.5 bg-gray-100 text-text-secondary rounded-full">子序列</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="text-xs text-text-secondary">
+                                    <i class="far fa-calendar-alt mr-1"></i> 2023-05-15 创建
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button id="btn-edit-playlist-2" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button id="btn-share-playlist-2" class="text-xs text-primary hover:text-blue-700">
+                                        <i class="fas fa-share-alt"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="create-playlist-card" class="border border-dashed border-gray-300 rounded-xl flex items-center justify-center p-6 hover:bg-gray-50 cursor-pointer">
+                        <div class="text-center">
+                            <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-2">
+                                <i class="fas fa-plus text-primary text-lg"></i>
+                            </div>
+                            <p class="text-primary font-medium">创建新题单</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- 页脚 -->
+    <footer id="main-footer" class="bg-white border-t border-gray-200 py-4 mt-8">
+        <div class="container mx-auto px-4 text-center text-sm text-text-secondary">
+            <p>© 2023 乐扣 Online Judge 平台 | 一款面向学生科技工作室成员及大学计算机专业学生的编程学习工具</p>
+        </div>
+    </footer>
+    
+    <!-- 查看代码模态框 -->
+    <div id="code-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-lg w-full max-w-4xl max-h-[80vh] flex flex-col">
+            <div class="flex items-center justify-between p-4 border-b border-gray-200">
+                <h3 id="modal-title" class="text-lg font-semibold">查看代码</h3>
+                <button id="close-modal" class="text-text-secondary hover:text-text-primary">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="p-4 overflow-auto custom-scrollbar flex-1">
+                <pre id="code-content" class="bg-gray-50 p-4 rounded-lg text-sm font-mono overflow-x-auto custom-scrollbar"></pre>
+            </div>
+            <div class="p-4 border-t border-gray-200 flex justify-end">
+                <button id="close-modal-btn" class="px-4 py-2 bg-gray-100 text-text-secondary rounded-lg hover:bg-gray-200">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取URL参数的辅助函数
+            function getUrlParams() {
+                const params = {};
+                const queryString = window.location.search.substring(1);
+                const urlParams = new URLSearchParams(queryString);
+                
+                for(const [key, value] of urlParams.entries()) {
+                    params[key] = value;
+                }
+                return params;
+            }
+            
+            // 标签页切换
+            const tabButtons = [
+                document.querySelector('#tab-submissions'),
+                document.querySelector('#tab-contests'),
+                document.querySelector('#tab-playlists')
+            ];
+            
+            const tabContents = [
+                document.querySelector('#submissions-content'),
+                document.querySelector('#contests-content'),
+                document.querySelector('#playlists-content')
+            ];
+            
+            tabButtons.forEach((button, index) => {
+                button.addEventListener('click', function() {
+                    // 重置所有标签和内容
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('tab-active');
+                        btn.classList.add('text-text-secondary');
+                    });
+                    
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // 激活当前标签和内容
+                    button.classList.add('tab-active');
+                    button.classList.remove('text-text-secondary');
+                    tabContents[index].classList.remove('hidden');
+                });
+            });
+            
+            // 查看代码模态框
+            const codeModal = document.querySelector('#code-modal');
+            const closeModalBtn = document.querySelector('#close-modal');
+            const closeModalButton = document.querySelector('#close-modal-btn');
+            const modalTitle = document.querySelector('#modal-title');
+            const codeContent = document.querySelector('#code-content');
+            
+            // 示例代码数据
+            const sampleCodes = {
+                '1': {
+                    title: '二分查找 - C++',
+                    code: `class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int left = 0;
+        int right = nums.size() - 1;
+        
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            
+            if (nums[mid] == target) {
+                return mid;
+            } else if (nums[mid] < target) {
+                left = mid + 1;
+            } else {
+                right = mid - 1;
+            }
+        }
+        
+        return -1;
+    }
+};`
+                },
+                '2': {
+                    title: '两数之和 - Python',
+                    code: `class Solution:
+    def twoSum(self, nums: List[int], target: int) -> List[int]:
+        hashmap = {}
+        for i, num in enumerate(nums):
+            complement = target - num
+            if complement in hashmap:
+                return [hashmap[complement], i]
+            hashmap[num] = i
+        return []`
+                },
+                '3': {
+                    title: '合并两个有序链表 - Java',
+                    code: `class Solution {
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        // 错误代码示例
+        if (l1 == null) return l2;
+        if (l2 == null) return l1;
+        
+        ListNode dummy = new ListNode(0);
+        ListNode curr = dummy;
+        
+        while (l1 != null && l2 != null) {
+            if (l1.val <= l2.val) {
+                curr.next = l1;
+                l1 = l1.next;
+            } else {
+                curr.next = l2;
+                l2 = l2.next;
+            }
+            curr = curr.next;
+        }
+        
+        // 这里有错误，应该是 curr.next = l1 != null ? l1 : l2;
+        return dummy.next;
+    }
+}`
+                },
+                '4': {
+                    title: '有效的括号 - JavaScript',
+                    code: `/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var isValid = function(s) {
+    // 超时代码示例 - 使用了低效的方法
+    while (s.includes('()') || s.includes('[]') || s.includes('{}')) {
+        s = s.replace('()', '').replace('[]', '').replace('{}', '');
+    }
+    return s === '';
+};`
+                },
+                '5': {
+                    title: '最长回文子串 - C++',
+                    code: `class Solution {
+public:
+    string longestPalindrome(string s) {
+        if (s.empty()) return "";
+        
+        int start = 0, maxLength = 1;
+        
+        for (int i = 0; i < s.length(); i++) {
+            // 以i为中心的奇数长度回文
+            expandAroundCenter(s, i, i, start, maxLength);
+            // 以i和i+1为中心的偶数长度回文
+            expandAroundCenter(s, i, i + 1, start, maxLength);
+        }
+        
+        return s.substr(start, maxLength);
+    }
+    
+private:
+    void expandAroundCenter(const string& s, int left, int right, int& start, int& maxLength) {
+        while (left >= 0 && right < s.length() && s[left] == s[right]) {
+            left--;
+            right++;
+        }
+        
+        // 回文长度
+        int length = right - left - 1;
+        if (length > maxLength) {
+            maxLength = length;
+            start = left + 1;
+        }
+    }
+};`
+                }
+            };
+            
+            // 查看代码按钮点击事件
+            document.querySelectorAll('[id^="btn-view-code-"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const codeId = this.id.split('-').pop();
+                    const codeData = sampleCodes[codeId];
+                    
+                    if (codeData) {
+                        modalTitle.textContent = codeData.title;
+                        codeContent.textContent = codeData.code;
+                        codeModal.classList.remove('hidden');
+                    }
+                });
+            });
+            
+            // 关闭模态框
+            closeModalBtn.addEventListener('click', function() {
+                codeModal.classList.add('hidden');
+            });
+            
+            closeModalButton.addEventListener('click', function() {
+                codeModal.classList.add('hidden');
+            });
+            
+            // 点击模态框背景关闭
+            codeModal.addEventListener('click', function(e) {
+                if (e.target === codeModal) {
+                    codeModal.classList.add('hidden');
+                }
+            });
+            
+            // 编辑个人信息按钮
+            document.querySelector('#btn-edit-profile').addEventListener('click', function() {
+                console.log('编辑个人信息');
+                // 在实际应用中，这里会打开编辑个人信息的模态框或页面
+            });
+            
+            // 创建新题单
+            document.querySelector('#create-playlist-card').addEventListener('click', function() {
+                window.location.href = 'P-PLAYLIST_LIST.html?action=create';
+            });
+            
+            // 编辑题单按钮
+            document.querySelectorAll('[id^="btn-edit-playlist-"]').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const playlistId = this.id.split('-').pop();
+                    window.location.href = `P-PLAYLIST_LIST.html?action=edit&playlistId=pl00${playlistId}`;
+                });
+            });
+            
+            // 分享题单按钮
+            document.querySelectorAll('[id^="btn-share-playlist-"]').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const playlistId = this.id.split('-').pop();
+                    console.log(`分享题单 pl00${playlistId}`);
+                    // 在实际应用中，这里会打开分享对话框
+                });
+            });
+            
+            // 导航链接
+            document.querySelectorAll('#main-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = this.getAttribute('href');
+                });
+            });
+            
+            // 侧边菜单链接
+            document.querySelectorAll('#side-nav a').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.location.href = this.getAttribute('href');
+                });
+            });
+            
+            // 筛选和排序
+            document.querySelector('#filter-result').addEventListener('change', function() {
+                console.log('筛选结果:', this.value);
+                // 在实际应用中，这里会根据筛选条件更新提交记录列表
+            });
+            
+            document.querySelector('#filter-difficulty').addEventListener('change', function() {
+                console.log('筛选难度:', this.value);
+                // 在实际应用中，这里会根据筛选条件更新提交记录列表
+            });
+            
+            document.querySelector('#filter-language').addEventListener('change', function() {
+                console.log('筛选语言:', this.value);
+                // 在实际应用中，这里会根据筛选条件更新提交记录列表
+            });
+            
+            document.querySelector('#sort-by').addEventListener('change', function() {
+                console.log('排序方式:', this.value);
+                // 在实际应用中，这里会根据排序方式更新提交记录列表
+            });
+            
+            // 分页按钮
+            document.querySelector('#page-next').addEventListener('click', function() {
+                console.log('下一页');
+                // 在实际应用中，这里会加载下一页数据
+            });
+        });
+    </script>
+</body>
+</html>
