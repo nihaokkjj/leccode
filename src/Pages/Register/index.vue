@@ -1,11 +1,11 @@
-<script setup>
-import {} from '@/'
-</script>
-
 <template>
-
+    
 </template>
 
-<style scoped>
+<script setup lang="ts">
+    
+</script>
 
+<style scoped lang="scss">
+    
 </style>

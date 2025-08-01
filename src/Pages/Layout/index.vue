@@ -1,14 +1,15 @@
 <script setup>
 import LayoutNav from './components/LayoutNav.vue'
-import LayoutHeader from './components/LayoutHeader.vue'
-//这两个的样式自己在首页里面去扣吧(Home)
+import LayoutMain from './components/LayoutMain.vue';
+import LayoutBottom from './components/LayoutBottom.vue';
+import { onBeforeMount } from 'vue';
 
 </script>
 
 <template>
-<div>
-  <LayoutNav />
-  <LayoutHeader />
-  <RouterView />
-</div>
+  <div class="container">
+    <LayoutNav />
+    <LayoutMain />
+    <LayoutBottom />
+  </div>
 </template>
